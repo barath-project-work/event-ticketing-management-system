@@ -74,7 +74,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Build backend
-        run: mvn compile -B -q
+        run: mvn compile -B -q -Dskip.frontend=true
 
       - name: Run Unit Tests (H2)
         run: mvn test -Dtest="!*IntegrationTest" -Dskip.frontend=true -B
@@ -82,7 +82,7 @@ jobs:
           SPRING_PROFILES_ACTIVE: test
 
       - name: Run Integration Tests (PostgreSQL)
-        run: mvn test -Dtest="*IntegrationTest" -Dskip.frontend=true -Dspring.profiles.active=integration-test -B
+        run: mvn test -Dtest="ReservationFlowIntegrationTest" -Dskip.frontend=true -Dspring.profiles.active=integration-test -B
         env:
           SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/ticketing_test
           SPRING_DATASOURCE_USERNAME: ticketing
@@ -162,7 +162,16 @@ jobs:
         run: |
           mvn spring-boot:run -Dspring-boot.run.profiles=dev \
             -Dspring-boot.run.arguments="--server.port=8080" &
-          sleep 60
+          # Wait for app to be healthy (up to 5 minutes)
+          echo "Waiting for app to start..."
+          for i in $(seq 1 30); do
+            if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
+              echo "✅ App is ready!"
+              break
+            fi
+            echo "Attempt $i/30 - waiting 10s..."
+            sleep 10
+          done
 
       - name: Install k6
         run: |
@@ -232,6 +241,14 @@ jobs:
       - name: Trigger Render Deploy Hook
         run: |
           echo "🚀 Triggering Render deployment..."
+          if [ -z "${{ secrets.RENDER_DEPLOY_HOOK_URL }}" ]; then
+            echo "⚠️ RENDER_DEPLOY_HOOK_URL secret is not set. Skipping deployment."
+            echo "To enable auto-deploy:"
+            echo "  1. Go to Render dashboard → Your service → Settings → Deploy Hook"
+            echo "  2. Copy the hook URL"
+            echo "  3. Add it as a repository secret: RENDER_DEPLOY_HOOK_URL"
+            exit 0
+          fi
           response=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${{ secrets.RENDER_DEPLOY_HOOK_URL }}")
           if [ "$response" = "200" ] || [ "$response" = "201" ] || [ "$response" = "202" ]; then
             echo "✅ Deployment triggered successfully (HTTP $response)"

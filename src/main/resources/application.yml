@@ -1,0 +1,109 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ticketing
+    username: ticketing
+    password: ticketing_secret
+    hikari:
+      maximum-pool-size: 50
+      connection-timeout: 3000
+      minimum-idle: 10
+      idle-timeout: 300000
+      max-lifetime: 600000
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        generate_statistics: true
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  cache:
+    type: redis
+    redis:
+      time-to-live: 60s
+      cache-null-values: false
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 16
+          max-idle: 8
+          min-idle: 4
+
+server:
+  port: 8080
+
+logging:
+  structured:
+    format:
+      console: json
+  level:
+    com.ticketing: DEBUG
+    org.hibernate: WARN
+    org.springframework.cache: INFO
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+      show-components: always
+  metrics:
+    tags:
+      application: ticketing
+
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        register-health-indicator: true
+        sliding-window-size: 20
+        minimum-number-of-calls: 10
+        permitted-number-of-calls-in-half-open-state: 5
+        automatic-transition-from-open-to-half-open-enabled: true
+        wait-duration-in-open-state: 10s
+        failure-rate-threshold: 50
+        slow-call-rate-threshold: 50
+        slow-call-duration-threshold: 2000ms
+        writable-stack-trace-enabled: true
+    instances:
+      reservationService:
+        base-config: default
+      database:
+        base-config: default
+        wait-duration-in-open-state: 30s
+
+retry:
+  max-attempts: 4
+  initial-delay-ms: 50
+  multiplier: 2.0
+  max-delay-ms: 500
+
+reservation:
+  hold:
+    duration-seconds: 180
+  sweeper:
+    fixed-rate-ms: 30000
+
+rate-limiting:
+  hold:
+    capacity: 100
+    refill-tokens: 50
+    refill-period-seconds: 1

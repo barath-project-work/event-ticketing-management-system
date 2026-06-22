@@ -1,0 +1,10 @@
+FROM postgres:16-alpine
+
+ENV POSTGRES_DB=ticketing
+ENV POSTGRES_USER=ticketing
+ENV POSTGRES_PASSWORD=${DB_PASSWORD:-ticketing_secret}
+
+EXPOSE 5432
+
+HEALTHCHECK --interval=10s --timeout=5s --retries=5 \
+  CMD pg_isready -U ticketing

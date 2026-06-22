@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ticketing-db
+    environment:
+      POSTGRES_DB: ticketing
+      POSTGRES_USER: ticketing
+      POSTGRES_PASSWORD: ticketing_secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ticketing"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ticketing-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: ticketing-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - ticketing-net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ticketing-app
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/ticketing
+      SPRING_DATASOURCE_USERNAME: ticketing
+      SPRING_DATASOURCE_PASSWORD: ticketing_secret
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      ADMIN_TOKEN: admin-token-001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - ticketing-net
+
+volumes:
+  postgres_data:
+
+networks:
+  ticketing-net:
+    driver: bridge

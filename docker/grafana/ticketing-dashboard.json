@@ -1,0 +1,65 @@
+{
+  "dashboard": {
+    "title": "Event Ticketing - Production Monitoring",
+    "tags": ["ticketing", "spring-boot", "production"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "title": "Hold Request Rate",
+        "type": "graph",
+        "targets": [{"expr": "rate(http_requests_total{method='POST',endpoint='/api/reservations/hold'}[1m])", "legendFormat": "Hold req/s"}],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}
+      },
+      {
+        "title": "Rate Limited Requests (429)",
+        "type": "graph",
+        "targets": [{"expr": "rate(http_requests_total{status='429'}[1m])", "legendFormat": "429/s"}],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+      },
+      {
+        "title": "Reservation Status Distribution",
+        "type": "piechart",
+        "targets": [{"expr": "reservation_status_total", "legendFormat": "{{status}}"}],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}
+      },
+      {
+        "title": "Sweeper Execution Duration",
+        "type": "graph",
+        "targets": [{"expr": "rate(sweeper_execution_seconds_sum[5m]) / rate(sweeper_execution_seconds_count[5m])", "legendFormat": "Avg duration"}],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}
+      },
+      {
+        "title": "Database Connection Pool",
+        "type": "graph",
+        "targets": [
+          {"expr": "hikaricp_connections_active", "legendFormat": "Active"},
+          {"expr": "hikaricp_connections_idle", "legendFormat": "Idle"},
+          {"expr": "hikaricp_connections_pending", "legendFormat": "Pending"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}
+      },
+      {
+        "title": "JVM Heap Memory",
+        "type": "graph",
+        "targets": [
+          {"expr": "jvm_memory_used_bytes{area='heap'}", "legendFormat": "Used"},
+          {"expr": "jvm_memory_max_bytes{area='heap'}", "legendFormat": "Max"}
+        ],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}
+      },
+      {
+        "title": "Circuit Breaker State",
+        "type": "stat",
+        "targets": [{"expr": "resilience4j_circuitbreaker_state", "legendFormat": "{{name}}: {{state}}"}],
+        "gridPos": {"h": 8, "w": 12, "x": 0, "y": 24}
+      },
+      {
+        "title": "Cache Hit Rate",
+        "type": "graph",
+        "targets": [{"expr": "rate(cache_hits_total[5m]) / (rate(cache_hits_total[5m]) + rate(cache_misses_total[5m]))", "legendFormat": "Hit ratio"}],
+        "gridPos": {"h": 8, "w": 12, "x": 12, "y": 24}
+      }
+    ]
+  },
+  "__inputs": [{"name": "DS_PROMETHEUS", "label": "Prometheus", "type": "datasource"}]
+}

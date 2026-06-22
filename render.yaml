@@ -1,0 +1,20 @@
+# Render Blueprint for Event Ticketing System
+# Deploy: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: event-ticketing
+    plan: free
+    env: docker
+    dockerfilePath: ./Dockerfile.render
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://dpg-xxxxx.render.com:5432/ticketing
+      - key: SPRING_DATASOURCE_USERNAME
+        value: ticketing
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false
+      - key: ADMIN_TOKEN
+        value: admin-token-001

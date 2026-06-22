@@ -12,11 +12,6 @@ spring:
       ddl-auto: validate
     show-sql: false
 
-  # Structured JSON logging for production
-  logging:
-    structured:
-      format: logstash
-
 # Resilience4j circuit breaker configuration
 resilience4j:
   circuitbreaker:
@@ -26,6 +21,13 @@ resilience4j:
         failure-rate-threshold: 50
         wait-duration-in-open-state: 10s
         permitted-number-of-calls-in-half-open-state: 3
+
+# Logging (structured JSON for production log aggregation)
+logging:
+  structured:
+    format: logstash
+  level:
+    com.ticketing: INFO
 
 # Rate limiting
 rate-limiting:

@@ -49,8 +49,7 @@ server:
 
 logging:
   structured:
-    format:
-      console: json
+    format: logstash
   level:
     com.ticketing: DEBUG
     org.hibernate: WARN

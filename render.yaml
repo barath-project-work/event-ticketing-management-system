@@ -14,11 +14,11 @@ services:
     dockerContext: .
     dockerfilePath: ./Dockerfile.render
     envVars:
-      - key: SPRING_PROFILES_ACTIVE
-        value: prod
+      # ⚠️ IMPORTANT: Replace SPRING_DATASOURCE_URL with your actual Neon URL
+      # Your Neon URL will look like: postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/neondb
+      # Add 'jdbc:' prefix → jdbc:postgresql://user:pass@ep-xxx.us-east-2.aws.neon.tech/neondb?sslmode=require
       - key: SPRING_DATASOURCE_URL
-        value: postgresql://neondb_owner:xxxxx@ep-xxxxx.us-east-2.aws.neon.tech/neondb?sslmode=require
-        # ⬆ REPLACE THIS with your actual Neon connection string
+        value: jdbc:postgresql://neondb_owner:CHANGE_ME@ep-change-me.us-east-2.aws.neon.tech/neondb?sslmode=require
       - key: SPRING_DATASOURCE_USERNAME
         value: neondb_owner
       - key: SPRING_DATASOURCE_PASSWORD

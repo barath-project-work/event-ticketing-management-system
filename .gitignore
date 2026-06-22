@@ -32,3 +32,8 @@ redis_data/
 
 # Test reports
 target/
+
+# Frontend Maven Plugin downloaded Node.js
+frontend/node/
+frontend/node
+*.pid

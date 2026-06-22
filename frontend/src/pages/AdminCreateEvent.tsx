@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Plus, ArrowLeft, Loader2 } from 'lucide-react';
+import { Plus, ArrowLeft, RefreshCw, CalendarRange, Users, Clock } from 'lucide-react';
 import { adminApi } from '../api/client';
 import type { InventoryStrategy } from '../api/types';
 import { showToast } from '../components/Toast';
@@ -43,23 +43,29 @@ export default function AdminCreateEvent() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
-      <Link to="/admin" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700">
-        <ArrowLeft className="w-4 h-4" /> Back to Admin
+    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in">
+      {/* Back */}
+      <Link to="/admin" className="inline-flex items-center gap-1.5 text-sm font-medium text-[#6b6b68] hover:text-[#CB202D] transition-colors group">
+        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+        Back to Admin
       </Link>
 
+      {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Create Event</h1>
-        <p className="mt-1 text-sm text-gray-500">Set up a new event with inventory strategy</p>
+        <div className="flex items-center gap-2 mb-1">
+          <CalendarRange className="w-5 h-5 text-[#CB202D]" />
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-[#2D2D2D] tracking-tight">Create Event</h1>
+        </div>
+        <p className="text-sm text-[#6b6b68]">Set up a new event with inventory strategy</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="card p-6 space-y-5">
-        {/* Name */}
+      <form onSubmit={handleSubmit} className="card-zomato p-6 sm:p-8 space-y-6">
+        {/* Event Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Event Name *</label>
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-1.5">Event Name *</label>
           <input
             type="text"
-            className="input-field"
+            className="input-zomato"
             placeholder="e.g. Hamilton - Broadway"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -69,10 +75,10 @@ export default function AdminCreateEvent() {
 
         {/* Venue */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Venue *</label>
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-1.5">Venue *</label>
           <input
             type="text"
-            className="input-field"
+            className="input-zomato"
             placeholder="e.g. Richard Rodgers Theatre"
             value={form.venue}
             onChange={(e) => setForm({ ...form, venue: e.target.value })}
@@ -82,10 +88,10 @@ export default function AdminCreateEvent() {
 
         {/* Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Event Date *</label>
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-1.5">Event Date *</label>
           <input
             type="datetime-local"
-            className="input-field"
+            className="input-zomato"
             value={form.eventDate}
             onChange={(e) => setForm({ ...form, eventDate: e.target.value })}
             required
@@ -94,67 +100,96 @@ export default function AdminCreateEvent() {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-1.5">Description</label>
           <textarea
-            className="input-field min-h-[80px]"
+            className="input-zomato min-h-[100px] resize-y"
             placeholder="Optional event description..."
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
         </div>
 
-        {/* Strategy */}
+        {/* Strategy Selection - Zomato card selector */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">Inventory Strategy *</label>
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-2">Inventory Strategy *</label>
           <div className="grid grid-cols-2 gap-3">
             <button
               type="button"
-              className={`rounded-lg border-2 p-4 text-left transition-all ${
+              className={`rounded-[12px] border-2 p-4 text-left transition-all duration-200 tilt-3d-inner ${
                 form.inventoryStrategy === 'PER_SEAT'
-                  ? 'border-primary-500 bg-primary-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-[#CB202D] bg-[#CB202D]/5 shadow-zomato-hover'
+                  : 'border-[#f0f0ee] bg-white hover:border-[#d1d1cf] hover:shadow-zomato'
               }`}
               onClick={() => setForm({ ...form, inventoryStrategy: 'PER_SEAT' })}
             >
-              <p className="font-semibold text-sm">Per-Seat</p>
-              <p className="text-xs text-gray-500 mt-1">Assigned seating for theaters & stadiums</p>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-1.5 rounded-[6px] bg-blue-100">
+                  <Users className="w-4 h-4 text-blue-600" />
+                </div>
+                <p className="font-extrabold text-sm text-[#2D2D2D]">Per-Seat</p>
+              </div>
+              <p className="text-xs text-[#6b6b68] leading-relaxed">
+                Assigned seating for theaters, stadiums & concerts
+              </p>
+              {form.inventoryStrategy === 'PER_SEAT' && (
+                <div className="mt-2 flex items-center gap-1 text-[11px] font-bold text-[#CB202D]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#CB202D]" /> Selected
+                </div>
+              )}
             </button>
             <button
               type="button"
-              className={`rounded-lg border-2 p-4 text-left transition-all ${
+              className={`rounded-[12px] border-2 p-4 text-left transition-all duration-200 tilt-3d-inner ${
                 form.inventoryStrategy === 'AGGREGATED'
-                  ? 'border-primary-500 bg-primary-50'
-                  : 'border-gray-200 hover:border-gray-300'
+                  ? 'border-[#CB202D] bg-[#CB202D]/5 shadow-zomato-hover'
+                  : 'border-[#f0f0ee] bg-white hover:border-[#d1d1cf] hover:shadow-zomato'
               }`}
               onClick={() => setForm({ ...form, inventoryStrategy: 'AGGREGATED' })}
             >
-              <p className="font-semibold text-sm">Aggregated</p>
-              <p className="text-xs text-gray-500 mt-1">Tier-based GA for festivals</p>
+              <div className="flex items-center gap-2 mb-2">
+                <div className="p-1.5 rounded-[6px] bg-emerald-100">
+                  <Clock className="w-4 h-4 text-emerald-600" />
+                </div>
+                <p className="font-extrabold text-sm text-[#2D2D2D]">Aggregated</p>
+              </div>
+              <p className="text-xs text-[#6b6b68] leading-relaxed">
+                Tier-based general admission for festivals & events
+              </p>
+              {form.inventoryStrategy === 'AGGREGATED' && (
+                <div className="mt-2 flex items-center gap-1 text-[11px] font-bold text-[#CB202D]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#CB202D]" /> Selected
+                </div>
+              )}
             </button>
           </div>
         </div>
 
         {/* Hold Duration */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+          <label className="block text-sm font-bold text-[#2D2D2D] mb-1.5">
             Hold Duration (seconds)
           </label>
-          <input
-            type="number"
-            className="input-field"
-            min={30}
-            max={600}
-            value={form.holdDurationSeconds}
-            onChange={(e) => setForm({ ...form, holdDurationSeconds: parseInt(e.target.value) || 180 })}
-          />
-          <p className="text-xs text-gray-400 mt-1">How long users can hold tickets before release (30-600s)</p>
+          <div className="relative">
+            <input
+              type="number"
+              className="input-zomato pl-10"
+              min={30}
+              max={600}
+              value={form.holdDurationSeconds}
+              onChange={(e) => setForm({ ...form, holdDurationSeconds: parseInt(e.target.value) || 180 })}
+            />
+            <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#b0b0ae]" />
+          </div>
+          <p className="text-xs text-[#b0b0ae] mt-1.5">
+            How long users can hold tickets before auto-release (30–600 seconds)
+          </p>
         </div>
 
         {/* Submit */}
         <div className="pt-2">
-          <button type="submit" disabled={submitting} className="btn-primary w-full">
+          <button type="submit" disabled={submitting} className="btn-zomato w-full text-base py-3">
             {submitting ? (
-              <><Loader2 className="w-4 h-4 animate-spin" /> Creating...</>
+              <><RefreshCw className="w-4 h-4 animate-spin" /> Creating Event...</>
             ) : (
               <><Plus className="w-4 h-4" /> Create Event</>
             )}

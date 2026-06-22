@@ -1,73 +1,307 @@
+@import '@fontsource/metropolis/400.css';
+@import '@fontsource/metropolis/500.css';
+@import '@fontsource/metropolis/600.css';
+@import '@fontsource/metropolis/700.css';
+@import '@fontsource/metropolis/800.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   html {
     scroll-behavior: smooth;
   }
-  
+
   body {
-    @apply antialiased text-gray-900;
+    @apply antialiased text-[#2D2D2D] bg-[#F4F4F2];
+    font-family: 'Metropolis', 'Inter', system-ui, sans-serif;
+  }
+
+  ::selection {
+    background-color: rgba(203, 32, 45, 0.15);
+    color: #CB202D;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d1d1cf;
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #b0b0ae;
   }
 }
 
 @layer components {
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm 
-      hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 
-      transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  /* Zomato-style buttons */
+  .btn-zomato {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white 
+      bg-[#CB202D] rounded-[8px] shadow-zomato 
+      hover:bg-[#a31a24] hover:shadow-zomato-hover hover:-translate-y-0.5
+      focus:outline-none focus:ring-2 focus:ring-[#CB202D] focus:ring-offset-2
+      transition-all duration-200 ease-out
+      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0;
   }
 
-  .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 
-      hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 
-      transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  .btn-zomato-outline {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-[#CB202D]
+      bg-white border-2 border-[#CB202D] rounded-[8px]
+      hover:bg-[#CB202D] hover:text-white hover:shadow-zomato-hover hover:-translate-y-0.5
+      focus:outline-none focus:ring-2 focus:ring-[#CB202D] focus:ring-offset-2
+      transition-all duration-200 ease-out
+      disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm 
-      hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 
-      transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  .btn-zomato-ghost {
+    @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-[#2D2D2D]
+      bg-transparent rounded-[8px]
+      hover:bg-black/5 hover:text-[#CB202D]
+      focus:outline-none focus:ring-2 focus:ring-[#CB202D]/30
+      transition-all duration-200;
   }
 
-  .btn-success {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm 
-      hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 
-      transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed;
+  .btn-zomato-success {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white
+      bg-[#1BA672] rounded-[8px] shadow-zomato
+      hover:bg-[#158c61] hover:shadow-zomato-hover hover:-translate-y-0.5
+      focus:outline-none focus:ring-2 focus:ring-[#1BA672] focus:ring-offset-2
+      transition-all duration-200 ease-out
+      disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  .input-field {
-    @apply block w-full rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900 
-      placeholder:text-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500
-      transition-all duration-150;
+  .btn-zomato-danger {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 text-sm font-semibold text-white
+      bg-[#CB202D] rounded-[8px] shadow-zomato
+      hover:bg-[#a31a24] hover:shadow-zomato-hover hover:-translate-y-0.5
+      focus:outline-none focus:ring-2 focus:ring-[#CB202D] focus:ring-offset-2
+      transition-all duration-200 ease-out
+      disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  .card {
-    @apply rounded-xl border border-gray-200 bg-white shadow-sm;
+  /* Zomato-style inputs */
+  .input-zomato {
+    @apply block w-full rounded-[8px] border border-[#d1d1cf] bg-white px-4 py-3 text-sm text-[#2D2D2D]
+      placeholder:text-[#b0b0ae] 
+      focus:border-[#CB202D] focus:outline-none focus:ring-1 focus:ring-[#CB202D]/30
+      transition-all duration-200;
   }
 
-  .badge {
-    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+  .input-zomato-search {
+    @apply block w-full rounded-[24px] border border-transparent bg-[#f0f0ee] px-5 py-3 pl-12 text-sm text-[#2D2D2D]
+      placeholder:text-[#b0b0ae]
+      focus:bg-white focus:border-[#CB202D]/30 focus:outline-none focus:ring-2 focus:ring-[#CB202D]/10
+      transition-all duration-200;
   }
 
-  .badge-green {
-    @apply badge bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20;
+  /* Zomato-style cards */
+  .card-zomato {
+    @apply rounded-[12px] bg-white;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
   }
 
-  .badge-yellow {
-    @apply badge bg-amber-50 text-amber-700 ring-1 ring-amber-600/20;
+  .card-zomato-3d {
+    @apply rounded-[12px] bg-white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 10px 20px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.02);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  .badge-red {
-    @apply badge bg-red-50 text-red-700 ring-1 ring-red-600/20;
+  .card-zomato-3d:hover {
+    transform: perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-4px) scale(1.01);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 20px 50px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.03);
   }
 
-  .badge-blue {
-    @apply badge bg-blue-50 text-blue-700 ring-1 ring-blue-600/20;
+  /* Zomato-style badge */
+  .badge-zomato {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
   }
 
-  .badge-gray {
-    @apply badge bg-gray-50 text-gray-700 ring-1 ring-gray-600/20;
+  .badge-zomato-green {
+    @apply badge-zomato bg-[#E8F5E9] text-[#1BA672];
+  }
+
+  .badge-zomato-red {
+    @apply badge-zomato bg-[#FBE7EA] text-[#CB202D];
+  }
+
+  .badge-zomato-yellow {
+    @apply badge-zomato bg-[#FFF8E1] text-[#B8860B];
+  }
+
+  .badge-zomato-gray {
+    @apply badge-zomato bg-[#f0f0ee] text-[#6b6b68];
+  }
+
+  .badge-zomato-blue {
+    @apply badge-zomato bg-[#E3F2FD] text-[#1565C0];
+  }
+
+  /* 3D Tilt effect wrapper */
+  .tilt-3d {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+  }
+
+  .tilt-3d-inner {
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-style: preserve-3d;
+  }
+
+  .tilt-3d:hover .tilt-3d-inner {
+    transform: rotateX(3deg) rotateY(-3deg) translateZ(10px);
+  }
+
+  /* Glassmorphism */
+  .glass {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Gradient text */
+  .text-gradient-zomato {
+    background: linear-gradient(135deg, #CB202D 0%, #a31a24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Zomato-style divider */
+  .divider-zomato {
+    @apply border-t border-[#f0f0ee];
+  }
+
+  /* Stats card with 3D depth */
+  .stat-3d {
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    transform-style: preserve-3d;
+  }
+
+  .stat-3d::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    background: linear-gradient(135deg, rgba(203, 32, 45, 0.08), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .stat-3d:hover {
+    transform: perspective(1000px) translateZ(15px) translateY(-4px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 20px 50px rgba(0, 0, 0, 0.08);
+  }
+
+  .stat-3d:hover::after {
+    opacity: 1;
+  }
+
+  /* Event card with image placeholder */
+  .event-card-img {
+    @apply rounded-[12px] overflow-hidden;
+    position: relative;
+  }
+
+  .event-card-img-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.6));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .event-card-img:hover .event-card-img-overlay {
+    opacity: 1;
+  }
+
+  /* Zomato-style section titles */
+  .section-title {
+    @apply text-lg font-bold text-[#2D2D2D];
+  }
+
+  .section-subtitle {
+    @apply text-sm text-[#6b6b68];
+  }
+
+  /* Floating pill / tag */
+  .pill-zomato {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-[#f0f0ee] text-[#6b6b68]
+      hover:bg-[#e5e5e3] transition-colors duration-200;
+  }
+
+  .pill-zomato-active {
+    @apply pill-zomato bg-[#CB202D] text-white hover:bg-[#a31a24];
+  }
+
+  /* Hero section for dashboard */
+  .hero-gradient {
+    background: linear-gradient(135deg, #2D2D2D 0%, #1A1A1A 50%, #2D2D2D 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 30% 50%, rgba(203, 32, 45, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 50%, rgba(203, 32, 45, 0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* Animated background dots */
+  .dots-pattern {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* Notification toast */
+  .toast-zomato {
+    @apply rounded-[12px] px-5 py-3.5 shadow-zomato-hover border-l-4;
+    animation: slideIn 0.3s ease-out;
+  }
+
+  .toast-zomato-success {
+    @apply toast-zomato bg-white border-l-[#1BA672] text-[#2D2D2D];
+  }
+
+  .toast-zomato-error {
+    @apply toast-zomato bg-white border-l-[#CB202D] text-[#2D2D2D];
+  }
+
+  .toast-zomato-info {
+    @apply toast-zomato bg-white border-l-[#1565C0] text-[#2D2D2D];
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
   }
 }

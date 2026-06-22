@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { CheckCircle, XCircle, X } from 'lucide-react';
+import { CheckCircle, XCircle, Info, X } from 'lucide-react';
 
 type ToastType = 'success' | 'error' | 'info';
 
@@ -16,6 +16,33 @@ export function showToast(type: ToastType, message: string) {
   const toast: Toast = { id: ++toastId, type, message };
   listeners.forEach((fn) => fn(toast));
 }
+
+const icons = {
+  success: CheckCircle,
+  error: XCircle,
+  info: Info,
+};
+
+const styles = {
+  success: {
+    border: 'border-l-emerald-500',
+    bg: 'bg-white',
+    icon: 'text-emerald-500',
+    text: 'text-[#2D2D2D]',
+  },
+  error: {
+    border: 'border-l-[#CB202D]',
+    bg: 'bg-white',
+    icon: 'text-[#CB202D]',
+    text: 'text-[#2D2D2D]',
+  },
+  info: {
+    border: 'border-l-blue-500',
+    bg: 'bg-white',
+    icon: 'text-blue-500',
+    text: 'text-[#2D2D2D]',
+  },
+};
 
 export default function ToastContainer() {
   const [toasts, setToasts] = useState<Toast[]>([]);
@@ -38,28 +65,25 @@ export default function ToastContainer() {
 
   return (
     <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 max-w-sm">
-      {toasts.map((t) => (
-        <div
-          key={t.id}
-          className={`flex items-start gap-3 px-4 py-3 rounded-lg shadow-lg border text-sm animate-slide-in ${
-            t.type === 'success'
-              ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
-              : t.type === 'error'
-              ? 'bg-red-50 border-red-200 text-red-800'
-              : 'bg-blue-50 border-blue-200 text-blue-800'
-          }`}
-        >
-          {t.type === 'success' ? (
-            <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          ) : t.type === 'error' ? (
-            <XCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          ) : null}
-          <span className="flex-1">{t.message}</span>
-          <button onClick={() => remove(t.id)} className="flex-shrink-0 hover:opacity-70">
-            <X className="w-4 h-4" />
-          </button>
-        </div>
-      ))}
+      {toasts.map((t) => {
+        const Icon = icons[t.type];
+        const s = styles[t.type];
+        return (
+          <div
+            key={t.id}
+            className={`${s.border} ${s.bg} ${s.text} rounded-[12px] shadow-zomato-hover border-4 border-l-4 p-4 flex items-start gap-3 text-sm animate-slide-in`}
+          >
+            <Icon className={`w-5 h-5 flex-shrink-0 mt-0.5 ${s.icon}`} />
+            <span className="flex-1 leading-relaxed">{t.message}</span>
+            <button
+              onClick={() => remove(t.id)}
+              className="flex-shrink-0 text-[#b0b0ae] hover:text-[#6b6b68] transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        );
+      })}
     </div>
   );
 }

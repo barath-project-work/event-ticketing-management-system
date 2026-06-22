@@ -16,8 +16,8 @@ const BASE_URL = import.meta.env.DEV ? '' : '';
 
 async function api<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
     ...options,
+    headers: { 'Content-Type': 'application/json', ...options?.headers as Record<string, string> },
   });
   if (!res.ok) {
     const body = await res.text();
@@ -108,7 +108,7 @@ export const adminApi = {
   createEvent: (req: CreateEventRequest) =>
     api<EventDetail>('/api/admin/events', {
       method: 'POST',
-      body: JSON.stringify(req),
+      body: JSON.stringify({ ...req, adminToken: ADMIN_TOKEN }),
       headers: { 'X-Admin-Token': ADMIN_TOKEN },
     }),
 

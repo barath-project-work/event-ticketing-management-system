@@ -4,15 +4,12 @@
 services:
   - type: web
     name: event-ticketing-api
-    runtime: java
+    runtime: docker
     repo: https://github.com/barath-project-work/event-ticketing-management-system
-    buildCommand: mvn clean package -Dskip.frontend=true -DskipTests
-    startCommand: java -jar target/event-ticketing-*.jar
+    dockerfilePath: ./Dockerfile
     envVars:
       - key: SPRING_PROFILES_ACTIVE
         value: default
-      - key: SERVER_PORT
-        value: "8080"
       - key: JAVA_OPTS
         value: "-Xmx256m -Xms128m"
     healthCheckPath: /actuator/health

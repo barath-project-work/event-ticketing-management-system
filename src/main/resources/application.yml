@@ -45,7 +45,7 @@ spring:
       timeout: 2000ms
 
 server:
-  port: 8080
+  port: ${PORT:8080}
 
 logging:
   level:

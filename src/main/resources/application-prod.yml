@@ -1,18 +1,44 @@
 # Production profile overrides
-# Designed for Render.com deployment where Redis may not be available
+# Uses PostgreSQL + Caffeine cache for simplicity (no Redis dependency)
 
 spring:
-  # Use Caffeine cache instead of Redis for simplicity
-  cache:
-    type: caffeine
-
-  # Flyway manages schema in prod
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/ticketing}
+    username: ${SPRING_DATASOURCE_USERNAME:ticketing}
+    password: ${SPRING_DATASOURCE_PASSWORD:ticketing_secret}
+    hikari:
+      maximum-pool-size: 50
+      connection-timeout: 3000
+      minimum-idle: 10
+      idle-timeout: 300000
+      max-lifetime: 600000
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+        generate_statistics: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+  cache:
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=60s
 
-# Resilience4j circuit breaker configuration
+logging:
+  structured:
+    format: logstash
+  level:
+    com.ticketing: INFO
+    org.hibernate: WARN
+
 resilience4j:
   circuitbreaker:
     configs:
@@ -22,14 +48,6 @@ resilience4j:
         wait-duration-in-open-state: 10s
         permitted-number-of-calls-in-half-open-state: 3
 
-# Logging (structured JSON for production log aggregation)
-logging:
-  structured:
-    format: logstash
-  level:
-    com.ticketing: INFO
-
-# Rate limiting
 rate-limiting:
   hold:
     capacity: 100

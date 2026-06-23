@@ -1,17 +1,25 @@
+# =============================================================================
+# Default profile: H2 + Caffeine (zero external dependencies)
+# Use 'prod' profile for PostgreSQL + Redis in production/docker
+# =============================================================================
+
 spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisReactiveAutoConfiguration
   datasource:
-    url: jdbc:postgresql://localhost:5432/ticketing
-    username: ticketing
-    password: ticketing_secret
+    url: jdbc:h2:mem:ticketing;DB_CLOSE_DELAY=-1;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
     hikari:
-      maximum-pool-size: 50
+      maximum-pool-size: 10
       connection-timeout: 3000
-      minimum-idle: 10
-      idle-timeout: 300000
-      max-lifetime: 600000
+      minimum-idle: 2
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update
     show-sql: false
     open-in-view: false
     properties:
@@ -20,36 +28,26 @@ spring:
           batch_size: 50
         order_inserts: true
         order_updates: true
-        generate_statistics: true
+        generate_statistics: false
   jackson:
     serialization:
       write-dates-as-timestamps: false
   flyway:
-    enabled: true
-    locations: classpath:db/migration
-    baseline-on-migrate: true
+    enabled: false
   cache:
-    type: redis
-    redis:
-      time-to-live: 60s
-      cache-null-values: false
+    type: caffeine
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=60s
   data:
     redis:
       host: ${REDIS_HOST:localhost}
       port: ${REDIS_PORT:6379}
       timeout: 2000ms
-      lettuce:
-        pool:
-          max-active: 16
-          max-idle: 8
-          min-idle: 4
 
 server:
   port: 8080
 
 logging:
-  structured:
-    format: logstash
   level:
     com.ticketing: DEBUG
     org.hibernate: WARN

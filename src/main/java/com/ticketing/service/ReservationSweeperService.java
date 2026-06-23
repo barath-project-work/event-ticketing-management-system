@@ -12,6 +12,7 @@ import com.ticketing.repository.ReservationRepository;
 import com.ticketing.repository.SeatRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +32,7 @@ public class ReservationSweeperService {
 
     @Scheduled(fixedRateString = "${reservation.sweeper.fixed-rate-ms:30000}")
     @Transactional
+    @CacheEvict(value = {"events", "eventDetails", "seats"}, allEntries = true)
     public void expireStaleHolds() {
         LocalDateTime now = LocalDateTime.now();
         List<Reservation> staleReservations = reservationRepository

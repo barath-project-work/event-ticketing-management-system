@@ -10,6 +10,7 @@ import com.ticketing.model.enums.SeatStatus;
 import com.ticketing.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
@@ -46,6 +47,7 @@ public class ReservationService {
         backoff = @Backoff(delay = 50, multiplier = 2.0, maxDelay = 500)
     )
     @Transactional
+    @CacheEvict(value = {"events", "eventDetails", "seats"}, allEntries = true)
     public ReservationResponse holdSeat(HoldSeatRequest request) {
         User user = tokenAuthService.authenticate(request.getToken());
         Event event = eventRepository.findById(request.getEventId())
@@ -114,6 +116,7 @@ public class ReservationService {
         backoff = @Backoff(delay = 50, multiplier = 2.0, maxDelay = 500)
     )
     @Transactional
+    @CacheEvict(value = {"events", "eventDetails", "seats"}, allEntries = true)
     public List<ReservationResponse> bulkHold(BulkHoldRequest request) {
         User user = tokenAuthService.authenticate(request.getToken());
         Event event = eventRepository.findById(request.getEventId())
@@ -172,6 +175,7 @@ public class ReservationService {
     // ---------------------------------------------------------------------------
 
     @Transactional
+    @CacheEvict(value = {"events", "eventDetails", "seats"}, allEntries = true)
     public ReservationResponse confirmReservation(Long reservationId, String token) {
         User user = tokenAuthService.authenticate(token);
 
@@ -227,6 +231,7 @@ public class ReservationService {
     // ---------------------------------------------------------------------------
 
     @Transactional
+    @CacheEvict(value = {"events", "eventDetails", "seats"}, allEntries = true)
     public ReservationResponse cancelReservation(Long reservationId, String token) {
         User user = tokenAuthService.authenticate(token);
 
@@ -288,6 +293,7 @@ public class ReservationService {
      * of a completed transaction, with full audit trail.
      */
     @Transactional
+    @CacheEvict(value = {"events", "eventDetails", "seats"}, allEntries = true)
     public ReservationResponse refundReservation(Long reservationId, String token) {
         User user = tokenAuthService.authenticate(token);
 

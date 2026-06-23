@@ -1,5 +1,8 @@
 package com.ticketing.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -51,22 +54,33 @@ public class CacheConfig {
     @Primary
     @Profile("!test")
     @ConditionalOnProperty(name = "spring.cache.type", havingValue = "redis", matchIfMissing = true)
-    public RedisCacheManager redisCacheManager(RedisConnectionFactory connectionFactory) {
+    public RedisCacheManager redisCacheManager(RedisConnectionFactory connectionFactory,
+                                                 ObjectMapper objectMapper) {
+        objectMapper = objectMapper.copy()
+            .registerModule(new JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        var jsonSerializer = new GenericJackson2JsonRedisSerializer(objectMapper);
+
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
             .entryTtl(Duration.ofSeconds(60))
             .disableCachingNullValues()
             .serializeValuesWith(
-                RedisSerializationContext.SerializationPair.fromSerializer(
-                    new GenericJackson2JsonRedisSerializer()));
+                RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer));
+
+        RedisCacheConfiguration config30 = RedisCacheConfiguration.defaultCacheConfig()
+            .entryTtl(Duration.ofSeconds(30))
+            .disableCachingNullValues()
+            .serializeValuesWith(
+                RedisSerializationContext.SerializationPair.fromSerializer(jsonSerializer));
+
+        RedisCacheConfiguration config60 = config30.entryTtl(Duration.ofSeconds(60));
 
         return RedisCacheManager.builder(connectionFactory)
             .cacheDefaults(config)
-            .withCacheConfiguration(EVENTS_CACHE,
-                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(30)))
-            .withCacheConfiguration(EVENT_DETAILS_CACHE,
-                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(60)))
-            .withCacheConfiguration(SEATS_CACHE,
-                RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofSeconds(30)))
+            .withCacheConfiguration(EVENTS_CACHE, config30)
+            .withCacheConfiguration(EVENT_DETAILS_CACHE, config60)
+            .withCacheConfiguration(SEATS_CACHE, config30)
             .build();
     }
 
@@ -81,7 +95,8 @@ public class CacheConfig {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager(EVENTS_CACHE, EVENT_DETAILS_CACHE, SEATS_CACHE);
         cacheManager.setCaffeine(Caffeine.newBuilder()
             .expireAfterWrite(Duration.ofSeconds(60))
-            .maximumSize(500));
+            .maximumSize(500)
+            .recordStats());
         cacheManager.setAllowNullValues(false);
         return cacheManager;
     }

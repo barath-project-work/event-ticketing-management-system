@@ -37,7 +37,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @Configuration
 @EnableWebSocket
-@Profile("!test & !integration-test")
+@Profile("!test")
 @RequiredArgsConstructor
 @Slf4j
 public class WebSocketConfig implements WebSocketConfigurer {

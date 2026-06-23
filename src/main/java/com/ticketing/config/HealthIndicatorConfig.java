@@ -2,9 +2,9 @@ package com.ticketing.config;
 
 import com.ticketing.repository.ReservationRepository;
 import com.ticketing.model.enums.ReservationStatus;
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -14,7 +14,6 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 /**
  * Custom health indicators for production monitoring.
@@ -24,8 +23,6 @@ import java.time.temporal.ChronoUnit;
  *   <li><b>DB Pool Health:</b> Monitors the database connection pool for exhaustion.
  *       When active connections approach the pool limit, it indicates a potential issue
  *       with connection leaks or insufficient pool sizing.</li>
- *   <li><b>Redis Health:</b> Verifies Redis connectivity using PING. Essential for cache-dependent
- *       endpoints to fail fast rather than hang on timeout.</li>
  *   <li><b>Stale Reservation Warning:</b> Alerts when the number of stale HELD reservations
  *       exceeds a threshold, indicating the sweeper may be backlogged or failing.</li>
  * </ul>
@@ -49,7 +46,7 @@ class DatabasePoolHealthIndicator implements HealthIndicator {
             stmt.execute("SELECT 1");
 
             return Health.up()
-                .withDetail("database", "PostgreSQL")
+                .withDetail("database", "H2 / PostgreSQL")
                 .withDetail("poolStatus", "connected")
                 .build();
         } catch (Exception e) {
@@ -63,10 +60,12 @@ class DatabasePoolHealthIndicator implements HealthIndicator {
 
 /**
  * Monitors Redis connectivity via PING command.
+ * Only activated when Redis is actually configured and available.
  */
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@ConditionalOnBean(RedisConnectionFactory.class)
 class RedisHealthIndicator implements HealthIndicator {
 
     private final RedisConnectionFactory redisConnectionFactory;
